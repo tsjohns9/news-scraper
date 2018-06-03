@@ -14,7 +14,7 @@ gulp.task('browser-sync', ['nodemon'], function() {
   });
 });
 
-// restarts our server like normal with nodemon.
+// restarts the server with nodemon
 gulp.task('nodemon', function(cb) {
   var started = false;
   return nodemon({
@@ -27,4 +27,5 @@ gulp.task('nodemon', function(cb) {
   });
 });
 
+// default gulp task
 gulp.task('default', ['browser-sync']);

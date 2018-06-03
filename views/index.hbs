@@ -1,0 +1,14 @@
+{{> nav }}
+{{> jumbo }}
+
+{{#if articles.length}}
+  <div class="container">
+     {{#each articles}}
+     <div class="article my-5">
+       <p class="mb-1">{{title}}</p>
+       <p class="mb-1">{{link}}</p>
+       <img src="{{img}}" alt="">
+     </div>
+     {{/each}}
+  </div>
+{{/if}}

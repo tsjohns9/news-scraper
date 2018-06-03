@@ -5,7 +5,6 @@ const mongoose = require('mongoose');
 const exphbs = require('express-handlebars');
 const axios = require('axios');
 const cheerio = require('cheerio');
-const db = require('./models');
 
 // Initialize Express
 const app = express();
@@ -21,8 +20,15 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
-app.set('view engine', 'handlebars');
+app.engine(
+  '.hbs',
+  exphbs({
+    extname: '.hbs',
+    defaultLayout: 'main',
+    partialsDir: __dirname + '/views/partials'
+  })
+);
+app.set('view engine', '.hbs');
 
 // Connect to the Mongo DB
 mongoose.connect('mongodb://localhost/news-scrapper');
