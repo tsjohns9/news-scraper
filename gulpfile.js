@@ -3,6 +3,15 @@
 var gulp = require('gulp');
 var browserSync = require('browser-sync');
 var nodemon = require('gulp-nodemon');
+var sass = require('gulp-sass');
+
+// Compile SCSS
+gulp.task('css:compile', function() {
+  return gulp
+    .src('./public/scss/*.scss')
+    .pipe(sass.sync({ outputStyle: 'expanded' }).on('error', sass.logError))
+    .pipe(gulp.dest('./public/css'));
+});
 
 // links browserSync with node server
 gulp.task('browser-sync', ['nodemon'], function() {
@@ -27,5 +36,7 @@ gulp.task('nodemon', function(cb) {
   });
 });
 
-// default gulp task
-gulp.task('default', ['browser-sync']);
+// default gulp task. compiles scss to css on any change
+gulp.task('default', ['browser-sync'], function() {
+  gulp.watch('./public/scss/*.scss', ['css:compile']);
+});

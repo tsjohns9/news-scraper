@@ -1,0 +1,25 @@
+a {
+  color: $black;
+  &:hover,
+  &:focus,
+  &:active {
+    color: $black;
+  }
+}
+
+body {
+  @include body-font;
+  color: $primary;
+}
+
+p,
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
+h3 {
+  font-size: 1.4rem;
+}
+

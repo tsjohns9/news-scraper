@@ -1,0 +1,10 @@
+.img-fluid {
+  width: 100% !important;
+  max-width: 300px !important;
+}
+
+@media (min-width: 768px) {
+  h3 {
+    font-size: 1.75rem;
+  }
+}
