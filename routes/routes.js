@@ -4,9 +4,9 @@ const cheerio = require('cheerio');
 const db = require('../models');
 
 // renders home page
-router.get('/', function(req, res) {
+router.get('/', (req, res) => {
   db.Article.find()
-    .then(articles => res.render('index', { articles }))
+    .then(articles => res.render('index', { page: '/', articles: articles }))
     .catch(err => console.log(err));
 });
 
@@ -32,6 +32,11 @@ router.get('/scrape', (req, res) => {
         .find('.headline a')
         .attr('href');
 
+      article.excerpt = $(element)
+        .find('.excerpt')
+        .first()
+        .text();
+
       // prevents the scraper from duplicating articles by checking if the article title exists in the db
       // if the article title does not exist, then it saves the article
       // if it does exist, then it updates the article with the newest value, which will be the same value as before
@@ -44,21 +49,20 @@ router.get('/scrape', (req, res) => {
 });
 
 // get articles from db
-router.get('/articles', function(req, res) {
+router.get('/articles', (req, res) => {
   db.Article.find({}).then(article => res.json(article));
 });
 
 // get specific article from db
-router.get('/articles/:id', function(req, res) {
+router.get('/articles/:id', (req, res) => {
   db.Article.findOne({ _id: req.params.id })
     // .populate('notes)
     .then(article => res.json(article))
     .catch(err => res.json(err));
 });
 
-// posts a new article to the db
-router.get('/articles', function(req, res) {
-  //
+router.get('/saved', (req, res) => {
+  res.render('saved.hbs', { page: '/saved', articles: [] });
 });
 
 module.exports = router;

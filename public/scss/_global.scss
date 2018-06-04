@@ -9,7 +9,7 @@ a {
 
 body {
   @include body-font;
-  color: $primary;
+  color: $black;
 }
 
 p,
@@ -23,3 +23,17 @@ h3 {
   font-size: 1.4rem;
 }
 
+.btn {
+  background-color: $primary;
+  border-radius: 0 !important;
+  color: white;
+
+  &:hover,
+  &:active {
+    background-color: darken($primary, 15%);
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba(14, 45, 78, 0.25)
+  }
+}

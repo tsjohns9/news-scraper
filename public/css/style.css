@@ -8,7 +8,7 @@ a:hover, a:focus, a:active {
 
 body {
   font-family: 'Song Myung', serif;
-  color: #263238;
+  color: #000;
 }
 
 p,
@@ -20,6 +20,20 @@ h3 {
 
 h3 {
   font-size: 1.4rem;
+}
+
+.btn {
+  background-color: #546e7a;
+  border-radius: 0 !important;
+  color: white;
+}
+
+.btn:hover, .btn:active {
+  background-color: #35454d;
+}
+
+.btn:focus {
+  box-shadow: 0 0 0 0.2rem rgba(14, 45, 78, 0.25);
 }
 
 .jumbotron {

@@ -1,6 +1,5 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-// const logger = require('morgan');
 const mongoose = require('mongoose');
 const exphbs = require('express-handlebars');
 const axios = require('axios');
@@ -10,27 +9,31 @@ const cheerio = require('cheerio');
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// Use express.static to serve the public folder as a static directory
+// serve static files from /public
 app.use(express.static('public'));
-
-// Use morgan logger for logging requests
-// app.use(logger('dev'));
 
 // Sets up Express to handle data parsing
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+// sets up handlebars
 app.engine(
   '.hbs',
   exphbs({
     extname: '.hbs',
     defaultLayout: 'main',
-    partialsDir: __dirname + '/views/partials'
+    partialsDir: __dirname + '/views/partials',
+    // if else helper used to check which page gets the 'active' tab class in the nav bar
+    helpers: {
+      ifEquals: function(arg1, arg2, options) {
+        return arg1 == arg2 ? options.fn(this) : options.inverse(this);
+      }
+    }
   })
 );
 app.set('view engine', '.hbs');
 
-// Connect to the Mongo DB
+// Connect to mongodb
 mongoose.connect('mongodb://localhost/news-scrapper');
 
 app.use(require('./routes/routes'));

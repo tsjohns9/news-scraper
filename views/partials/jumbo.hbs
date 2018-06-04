@@ -1,3 +1,6 @@
 <div class="jumbotron">
-  <h1 class="display-4 text-center">Scrape The Onion</h1>
+  <h1 class="display-4 text-center">
+    {{#ifEquals page "/saved"}} Saved Articles{{/ifEquals}}
+    {{#ifEquals page "/"}} Scrape The Onion{{/ifEquals}}
+  </h1>
 </div>
