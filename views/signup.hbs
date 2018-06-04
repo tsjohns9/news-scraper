@@ -1,0 +1,23 @@
+{{> nav }}
+<div class="container">
+  {{#if errors}}
+    {{#each errors}}
+      <p class="text-danger">{{this.msg}}</p>
+    {{/each}}
+  {{/if}}
+  <form method="POST" action="/register">
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input name="username" type="text" class="form-control" id="username" aria-describedby="username" placeholder="Enter username">
+    </div>
+    <div class="form-group">
+      <label for="password1">Password</label>
+      <input name="password" type="password" class="form-control" id="password1" placeholder="Password">
+    </div>
+    <div class="form-group">
+      <label for="password2">Re-enter password</label>
+      <input name="password2" type="password" class="form-control" id="password2" placeholder="Re-enter password">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>

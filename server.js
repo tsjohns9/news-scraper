@@ -4,6 +4,9 @@ const mongoose = require('mongoose');
 const exphbs = require('express-handlebars');
 const axios = require('axios');
 const cheerio = require('cheerio');
+const cookieParser = require('cookie-parser');
+const expressValidator = require('express-validator');
+const session = require('express-session');
 
 // Initialize Express
 const app = express();
@@ -15,6 +18,19 @@ app.use(express.static('public'));
 // Sets up Express to handle data parsing
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+// validates form submission
+app.use(expressValidator());
+
+// saves the users session
+app.use(cookieParser());
+app.use(
+  session({
+    secret: 'secret',
+    saveUninitialized: false,
+    resave: false
+  })
+);
 
 // sets up handlebars
 app.engine(
@@ -36,7 +52,8 @@ app.set('view engine', '.hbs');
 // Connect to mongodb
 mongoose.connect('mongodb://localhost/news-scrapper');
 
-app.use(require('./routes/routes'));
+app.use(require('./routes/html-routes'));
+app.use(require('./routes/api-routes'));
 
 // starts the server
 app.listen(PORT, function() {

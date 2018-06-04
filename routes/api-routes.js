@@ -3,13 +3,6 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const db = require('../models');
 
-// renders home page
-router.get('/', (req, res) => {
-  db.Article.find()
-    .then(articles => res.render('index', { page: '/', articles: articles }))
-    .catch(err => console.log(err));
-});
-
 router.get('/scrape', (req, res) => {
   axios.get('https://www.theonion.com/c/news-in-brief').then(response => {
     const $ = cheerio.load(response.data);
@@ -48,11 +41,6 @@ router.get('/scrape', (req, res) => {
   res.redirect('/');
 });
 
-// get articles from db
-router.get('/articles', (req, res) => {
-  db.Article.find({}).then(article => res.json(article));
-});
-
 // get specific article from db
 router.get('/articles/:id', (req, res) => {
   db.Article.findOne({ _id: req.params.id })
@@ -61,8 +49,29 @@ router.get('/articles/:id', (req, res) => {
     .catch(err => res.json(err));
 });
 
-router.get('/saved', (req, res) => {
-  res.render('saved.hbs', { page: '/saved', articles: [] });
+router.post('/register', (req, res) => {
+  // checks for valid form input
+  req.checkBody('username', 'Username is required').notEmpty();
+  req.check('username', 'Username must be at least 4 characters').isLength({ min: 4 });
+  req.checkBody('password', 'Password is required').notEmpty();
+  req.checkBody('password2', 'Passwords do not match').equals(req.body.password);
+  req
+    .check('password', 'Password must be at least 4 characters')
+    .isLength({ min: 4 })
+    .equals(req.body.password2);
+
+  // stores possible errors
+  const errors = req.validationErrors();
+
+  // if there are errors, store it on the user session
+  if (errors) {
+    req.session.errors = errors;
+    res.redirect('/signup');
+    // successful sign up
+  } else {
+    req.session.success = 'Welcome, ' + req.body.username;
+    res.redirect('/');
+  }
 });
 
 module.exports = router;

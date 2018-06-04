@@ -1,6 +1,12 @@
 {{> nav }}
 {{> jumbo }}
 
+{{#if success}}
+<div class="container">
+  <p class="text-success">{{success}}</p>
+</div>
+{{/if}}
+
 {{#if articles.length}}
   <div class="container">
     {{#each articles}}
