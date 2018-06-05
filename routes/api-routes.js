@@ -2,6 +2,7 @@ const router = require('express').Router();
 const axios = require('axios');
 const cheerio = require('cheerio');
 const db = require('../models');
+const User = db.User;
 
 router.get('/scrape', (req, res) => {
   axios.get('https://www.theonion.com/c/news-in-brief').then(response => {
@@ -52,13 +53,10 @@ router.get('/articles/:id', (req, res) => {
 router.post('/register', (req, res) => {
   // checks for valid form input
   req.checkBody('username', 'Username is required').notEmpty();
-  req.check('username', 'Username must be at least 4 characters').isLength({ min: 4 });
+  req.checkBody('username', 'Username must be at least 4 characters').isLength({ min: 4 });
   req.checkBody('password', 'Password is required').notEmpty();
+  req.checkBody('password', 'Password must be at least 4 characters').isLength({ min: 4 });
   req.checkBody('password2', 'Passwords do not match').equals(req.body.password);
-  req
-    .check('password', 'Password must be at least 4 characters')
-    .isLength({ min: 4 })
-    .equals(req.body.password2);
 
   // stores possible errors
   const errors = req.validationErrors();
@@ -69,6 +67,8 @@ router.post('/register', (req, res) => {
     res.redirect('/signup');
     // successful sign up
   } else {
+    const newUser = new User(req.body);
+    newUser.createUser(newUser);
     req.session.success = 'Welcome, ' + req.body.username;
     res.redirect('/');
   }
