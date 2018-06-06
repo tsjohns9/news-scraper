@@ -7,6 +7,8 @@ const cheerio = require('cheerio');
 const cookieParser = require('cookie-parser');
 const expressValidator = require('express-validator');
 const session = require('express-session');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').strategy;
 
 // Initialize Express
 const app = express();
@@ -31,6 +33,10 @@ app.use(
     resave: false
   })
 );
+
+// passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 // sets up handlebars
 app.engine(

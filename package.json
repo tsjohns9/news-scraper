@@ -21,6 +21,8 @@
     "express-validator": "^5.2.0",
     "mongoose": "^5.0.16",
     "morgan": "^1.9.0",
+    "passport": "^0.4.0",
+    "passport-http": "^0.3.0",
     "request": "^2.85.0"
   },
   "devDependencies": {

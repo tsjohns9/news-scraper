@@ -9,8 +9,7 @@ const Schema = mongoose.Schema;
 const UserSchema = new Schema({
   // `name` must be unique and of type String
   username: {
-    type: String,
-    unique: true
+    type: String
   },
   password: {
     type: String
@@ -39,29 +38,29 @@ UserSchema.methods.createUser = function(newUser) {
       // Saves user to db
       newUser
         .save()
-        .then(res => console.log(res))
-        .catch(err => console.log(err));
+        .then(res => console.log('saved:', res))
+        .catch(err => console.log('ERR:', err));
     });
   });
 };
 
 // check password when signing in
-UserSchema.methods.comparePassword = function() {
-  //
+UserSchema.methods.checkPassword = function(plainPass, hash, callback) {
+  bcrypt.compare(plainPass, hash, function(err, isMatched) {
+    callback(null, isMatched);
+  });
 };
 
 // get user on successful sign in
-UserSchema.methods.getUser = function() {
-  //
+UserSchema.methods.findByUserName = function(user, callback) {
+  User.findOne({ username: user }, callback);
 };
 
-// check if the user exists before creating a new one
-UserSchema.methods.checkUser = function() {
-  //
-};
-
+function getUserById(id, callback) {
+  User.findById(id, callback);
+}
 // This creates our model from the above schema, using mongoose's model method
 const User = mongoose.model('User', UserSchema);
 
 // Export the User model
-module.exports = User;
+module.exports = { User, getUserById };

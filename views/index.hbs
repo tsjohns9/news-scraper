@@ -8,31 +8,29 @@
 {{/if}}
 
 <div class="container article-container">
-  {{!-- Stores saved articles when the scrape button is pressed --}}
-</div>
-
-{{!-- displays articles from the db if there are any --}}
-{{#if articles.length}}
-  <div class="container saved-articles">
-    {{#each articles}}
-      <div class="row article my-5 pb-4">
-        <div class="col-sm-5 mb-3 mb-sm-3">
-          <a href="{{link}}" target="_blank">
-            <img class="img-fluid" src="{{img}}">
-          </a>
+  {{!-- displays articles from the db if there are any --}}
+  {{#if articles.length}}
+     {{!-- Stores saved articles when the scrape button is pressed --}}
+    <div class="container saved-articles">
+      {{#each articles}}
+        <div class="row article my-5 pb-4">
+          <div class="col-sm-5 mb-3 mb-sm-3">
+            <a href="{{link}}" target="_blank">
+              <img class="img-fluid" src="{{img}}">
+            </a>
+          </div>
+          <div class="col-sm-7 border-bottom border-secondary pb-3 pb-sm-3">
+            <h3 class="mb-2">
+              <a href="{{link}}" target="_blank">{{title}}</a> 
+            </h3>
+            <p class="mb-2">{{excerpt}}</p>
+            <button type="button" class="btn">Save Article</button>
+          </div>
         </div>
-        <div class="col-sm-7 border-bottom border-secondary pb-3 pb-sm-3">
-          <h3 class="mb-2">
-            <a href="{{link}}" target="_blank">{{title}}</a> 
-          </h3>
-          <p class="mb-2">{{excerpt}}</p>
-          <button type="button" class="btn">Save Article</button>
-        </div>
-      </div>
-    {{/each}}
-  </div>
+      {{/each}}
   {{else}}
-  <div>
-    <h2 class="text-center">No Articles!</h2>
-  </div>
-{{/if}}
+    <div>
+      <h2 class="text-center none">No Articles!</h2>
+    </div>
+  {{/if}}
+</div>
