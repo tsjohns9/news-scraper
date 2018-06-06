@@ -5,41 +5,50 @@ const db = require('../models');
 const User = db.User;
 
 router.get('/scrape', (req, res) => {
-  axios.get('https://www.theonion.com/c/news-in-brief').then(response => {
-    const $ = cheerio.load(response.data);
+  axios
+    .get('https://www.theonion.com/c/news-in-brief')
+    .then(response => {
+      const $ = cheerio.load(response.data);
 
-    // stores title, image, and link for each article
-    $('div.item__content').each((i, element) => {
-      const article = {};
+      // stores title, image, and link for each article
+      $('div.item__content').each((i, element) => {
+        const article = {};
 
-      article.title = $(element)
-        .find('h1')
-        .text();
+        article.title = $(element)
+          .find('h1')
+          .text();
 
-      article.img = $(element)
-        .find('.img-wrapper picture')
-        .children()
-        .first()
-        .attr('data-srcset');
+        article.img = $(element)
+          .find('.img-wrapper picture')
+          .children()
+          .first()
+          .attr('data-srcset');
 
-      article.link = $(element)
-        .find('.headline a')
-        .attr('href');
+        article.link = $(element)
+          .find('.headline a')
+          .attr('href');
 
-      article.excerpt = $(element)
-        .find('.excerpt')
-        .first()
-        .text();
+        article.excerpt = $(element)
+          .find('.excerpt')
+          .first()
+          .text();
 
-      // prevents the scraper from duplicating articles by checking if the article title exists in the db
-      // if the article title does not exist, then it saves the article
-      // if it does exist, then it updates the article with the newest value, which will be the same value as before
-      db.Article.update({ title: article.title }, { $set: article }, { upsert: true })
-        // .then(article => console.log(article))
+        // prevents the scraper from duplicating articles by checking if the article title exists in the db
+        // if the article title does not exist, then it saves the article
+        // if it does exist, then it updates the article with the newest value, which will be the same value as before
+        db.Article.update({ title: article.title }, { $set: article }, { upsert: true })
+          // .then(article => console.log(article))
+          .catch(err => console.log(err));
+      });
+    })
+    .then(() => {
+      // loads all articles when '/' is accessed
+      db.Article.find()
+        .then(articles => {
+          res.json(articles);
+        })
         .catch(err => console.log(err));
     });
-  });
-  res.redirect('/');
 });
 
 // get specific article from db

@@ -36,6 +36,10 @@ h3 {
   box-shadow: 0 0 0 0.2rem rgba(14, 45, 78, 0.25);
 }
 
+#scrape:hover {
+  cursor: pointer;
+}
+
 .jumbotron {
   background: url("../img/pattern.png");
   border-radius: 0 !important;

@@ -7,8 +7,13 @@
 </div>
 {{/if}}
 
+<div class="container article-container">
+  {{!-- Stores saved articles when the scrape button is pressed --}}
+</div>
+
+{{!-- displays articles from the db if there are any --}}
 {{#if articles.length}}
-  <div class="container">
+  <div class="container saved-articles">
     {{#each articles}}
       <div class="row article my-5 pb-4">
         <div class="col-sm-5 mb-3 mb-sm-3">
