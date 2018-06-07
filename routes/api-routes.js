@@ -89,9 +89,21 @@ router.post('/register', (req, res) => {
     // successful sign up
   } else {
     const newUser = new User.User(req.body);
-    newUser.createUser(newUser);
-    req.session.success = 'Welcome, ' + req.body.username;
-    res.redirect('/');
+    console.log(newUser);
+    newUser.checkIfUserExists(newUser, (err, result) => {
+      if (err) throw err;
+      if (!result) {
+        newUser.createUser(newUser, saved => {
+          req.session.success = 'Welcome, ' + req.body.username;
+          passport.authenticate('local', {
+            successRedirect: '/',
+            failureRedirect: '/register'
+          })(req, res);
+        });
+      } else {
+        res.redirect('/signup');
+      }
+    });
   }
 });
 

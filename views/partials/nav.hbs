@@ -13,27 +13,26 @@
           <a class="nav-link" href="/">Home
           </a>
         </li>
-         {{#if auth}}
-          <li class="nav-item {{#ifEquals page "/saved"}} active{{/ifEquals}}">
-            <a class="nav-link" href="/saved">My Saved Articles</a>
-          </li>
-         {{/if}}
+
+        <li class="nav-item {{#ifEquals page "/saved"}} active{{/ifEquals}}">
+          <a class="nav-link" href="/saved">My Saved Articles</a>
+        </li>
+
         <li class="nav-item">
           <a class="nav-link" id="scrape">Scrape Articles</a>
         </li>
-         {{#unless auth}}
-          <li class="nav-item">
-            <a class="nav-link {{#ifEquals page "/login"}} active{{/ifEquals}}" id="scrape" href="/login">Login</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link {{#ifEquals page "/signup"}} active{{/ifEquals}}" id="scrape" href="/signup">Sign Up</a>
-          </li>
-        {{/unless}}
-        {{#if auth}}
-          <li class="nav-item">
-            <a class="nav-link" id="scrape" href="/logout">Logout</a>
-          </li>
-        {{/if}}
+
+        <li class="nav-item">
+          <a class="nav-link {{#ifEquals page "/login"}} active{{/ifEquals}}" id="scrape" href="/login">Login</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {{#ifEquals page "/signup"}} active{{/ifEquals}}" id="scrape" href="/signup">Sign Up</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" id="scrape" href="/logout">Logout</a>
+        </li>
+
 
       </ul>
     </div>

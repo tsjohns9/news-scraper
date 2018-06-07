@@ -28,7 +28,8 @@ const UserSchema = new Schema({
 });
 
 // creates new user
-UserSchema.methods.createUser = function(newUser) {
+UserSchema.methods.createUser = function(newUser, callback) {
+  const cb = callback;
   // hashes password
   bcrypt.genSalt(10, function(err, salt) {
     bcrypt.hash(newUser.password, salt, function(err, hash) {
@@ -38,10 +39,14 @@ UserSchema.methods.createUser = function(newUser) {
       // Saves user to db
       newUser
         .save()
-        .then(res => console.log('saved:', res))
+        .then(res => cb())
         .catch(err => console.log('ERR:', err));
     });
   });
+};
+
+UserSchema.methods.checkIfUserExists = function(potentialUser, callback) {
+  User.findOne({ username: potentialUser.username }, callback);
 };
 
 // check password when signing in

@@ -10,6 +10,7 @@ $(document).ready(function() {
 
   // appends each article to the page
   function displayArticles(data) {
+    console.log(data);
     $('.saved-articles').empty();
     $('.none').remove();
     data.forEach(article => {

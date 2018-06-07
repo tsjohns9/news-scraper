@@ -1,5 +1,10 @@
 {{> nav }}
 <div class="container">
+  {{#if userExists}}
+    <p class="text-danger">
+      {{userExists}}
+    </p>
+  {{/if}}
   {{#if errors}}
     {{#each errors}}
       <p class="text-danger">{{this.msg}}</p>
