@@ -24,8 +24,28 @@ const UserSchema = new Schema({
       // The ObjectIds will refer to the ids in the Note model
       ref: 'Note'
     }
+  ],
+  savedArticles: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Article'
+    }
   ]
 });
+
+UserSchema.methods.savedArticle = function(articleId, userId) {
+  User.update({ _id: userId }, { $push: { savedArticles: articleId } }, { new: true })
+    .then(res => console.log(res))
+    .catch(err => console.log(err));
+};
+
+UserSchema.methods.getSavedArticles = function(userId, obj, callback) {
+  const infoObject = obj;
+  User.find({ _id: userId })
+    .populate('savedArticles')
+    .then(res => callback(res, infoObject))
+    .catch(err => console.log(err));
+};
 
 // creates new user
 UserSchema.methods.createUser = function(newUser, callback) {

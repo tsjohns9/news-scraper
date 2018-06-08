@@ -6,10 +6,12 @@ const db = require('../models');
 // obj.auth is used to determine what parts of the nav items are displayed
 
 router.get('/', (req, res) => {
-  console.log('Are you authenticated?', req.user);
   const obj = {};
+  const flashSuccess = req.flash('success')[0];
   obj.page = '/';
-  obj.success = req.session.success;
+  obj.success = req.user && flashSuccess ? flashSuccess + req.user.username : null;
+  obj.logout = req.flash('logout')[0] || null;
+  obj.isAuthenticated = req.isAuthenticated();
 
   // loads all articles when '/' is accessed
   db.Article.find()
@@ -17,7 +19,7 @@ router.get('/', (req, res) => {
       obj.articles = articles;
 
       res.render('index', obj);
-      req.session.success = null;
+      obj.success = null;
     })
     .catch(err => console.log(err));
 });
@@ -26,16 +28,21 @@ router.get('/', (req, res) => {
 router.get('/saved', (req, res) => {
   const obj = {};
   obj.page = '/saved';
-  obj.articles = [];
-  res.render('saved.hbs', obj);
+  obj.isAuthenticated = req.isAuthenticated();
+  req.user.getSavedArticles(req.user._id, obj, result => {
+    console.log(result[0].savedArticles);
+    obj.articles = result[0].savedArticles;
+    res.render('saved.hbs', obj);
+  });
 });
 
 // signup page
 router.get('/signup', (req, res) => {
   const obj = {};
   obj.page = '/signup';
-  obj.errors = req.session.errors;
-
+  obj.isAuthenticated = req.isAuthenticated();
+  obj.errors = req.session.errors || null;
+  obj.failure = req.flash('failure')[0] || null;
   res.render('signup.hbs', obj);
   req.session.errors = null;
 });
@@ -44,13 +51,16 @@ router.get('/signup', (req, res) => {
 router.get('/login', (req, res) => {
   const obj = {};
   obj.page = '/login';
-  obj.errors = req.session.errors;
+  obj.isAuthenticated = req.isAuthenticated();
+  obj.errors = req.session.errors || null;
+  obj.failure = req.flash('error')[0] || null;
   res.render('login.hbs', obj);
   req.session.errors = null;
 });
 
 router.get('/logout', (req, res) => {
   if (req.isAuthenticated()) {
+    req.flash('logout', req.user.username + ' has logged out');
     console.log('logged out');
     req.logout();
   } else {

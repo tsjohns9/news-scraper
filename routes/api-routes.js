@@ -71,6 +71,12 @@ router.get('/clear', (req, res) => {
     .catch(err => console.log('71:', err));
 });
 
+router.post('/saveArticle', (req, res) => {
+  console.log('userid:', req.user._id);
+  req.user.savedArticle(req.body.id, req.user._id);
+  res.end();
+});
+
 router.post('/register', (req, res) => {
   // checks for valid form input
   req.checkBody('username', 'Username is required').notEmpty();
@@ -89,18 +95,19 @@ router.post('/register', (req, res) => {
     // successful sign up
   } else {
     const newUser = new User.User(req.body);
-    console.log(newUser);
     newUser.checkIfUserExists(newUser, (err, result) => {
       if (err) throw err;
       if (!result) {
         newUser.createUser(newUser, saved => {
-          req.session.success = 'Welcome, ' + req.body.username;
+          req.flash('success', 'Welcome, ');
           passport.authenticate('local', {
             successRedirect: '/',
-            failureRedirect: '/register'
+            failureRedirect: '/signup',
+            successFlash: 'Welcome, '
           })(req, res);
         });
       } else {
+        req.flash('failure', 'Username already exists');
         res.redirect('/signup');
       }
     });
@@ -109,7 +116,12 @@ router.post('/register', (req, res) => {
 
 router.post(
   '/login',
-  passport.authenticate('local', { failureRedirect: '/login', successRedirect: '/' }),
+  passport.authenticate('local', {
+    failureRedirect: '/login',
+    successRedirect: '/',
+    failureFlash: 'Invalid username or password.',
+    successFlash: 'Welcome, '
+  }),
   (req, res) => {
     // If this function gets called, authentication was successful.
     // `req.user` contains the authenticated user.

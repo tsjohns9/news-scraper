@@ -1,6 +1,31 @@
 {{> nav }}
 {{> jumbo }}
 
-  <div>
-    <h2 class="text-center">No Articles!</h2>
+<div class="container article-container">
+  {{!-- displays articles from the db if there are any --}} 
+  {{#if articles.length}} 
+    <div class="container saved-articles">
+      {{#each articles}}
+        <div class="row article my-5 pb-4">
+          <div class="col-sm-5 mb-3 mb-sm-3">
+            <a href="{{link}}" target="_blank">
+              <img class="img-fluid" src="{{img}}">
+            </a>
+          </div>
+          <div class="col-sm-7 border-bottom border-secondary pb-3 pb-sm-3">
+            <h3 class="mb-2">
+              <a href="{{link}}" target="_blank">{{title}}</a>
+            </h3>
+            <p class="mb-2">{{excerpt}}</p>
+            <button type="button" class="btn create-note" data-id="{{_id}}">Create Note</button>
+            <button type="button" class="btn delete-article" data-id="{{_id}}">Remove Article</button>
+          </div>
+        </div>
+      {{/each}} 
+    {{else}}
+      <div>
+        <h2 class="text-center none">No Articles!</h2>
+      </div>
+  {{/if}}
   </div>
+</div>

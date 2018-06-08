@@ -6,6 +6,11 @@
     <p class="text-success">{{success}}</p>
   </div>
 {{/if}}
+{{#if logout}}
+  <div class="container">
+    <p class="text-success">{{logout}}</p>
+  </div>
+{{/if}}
 
 <div class="container article-container">
   {{!-- displays articles from the db if there are any --}}
@@ -24,13 +29,14 @@
               <a href="{{link}}" target="_blank">{{title}}</a> 
             </h3>
             <p class="mb-2">{{excerpt}}</p>
-            <button type="button" class="btn">Save Article</button>
+            <button type="button" class="btn save-article" data-id="{{_id}}">Save Article</button>
           </div>
         </div>
       {{/each}}
-  {{else}}
-    <div>
-      <h2 class="text-center none">No Articles!</h2>
-    </div>
-  {{/if}}
+    {{else}}
+      <div>
+        <h2 class="text-center none">No Articles!</h2>
+      </div>
+    {{/if}}
+  </div>
 </div>

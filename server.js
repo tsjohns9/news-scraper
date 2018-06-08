@@ -1,4 +1,5 @@
 const express = require('express');
+const flash = require('connect-flash');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const exphbs = require('express-handlebars');
@@ -33,6 +34,7 @@ app.use(
     resave: false
   })
 );
+app.use(flash());
 
 // passport
 app.use(passport.initialize());

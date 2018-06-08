@@ -5,6 +5,9 @@
       <p class="text-danger">{{this.msg}}</p>
     {{/each}}
   {{/if}}
+  {{#if failure}}
+    <p class="text-danger">{{failure}}</p>
+  {{/if}}
   <form method="POST" action="/login">
     <div class="form-group">
       <label for="username">Username</label>

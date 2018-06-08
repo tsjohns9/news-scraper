@@ -8,6 +8,13 @@ $(document).ready(function() {
     });
   });
 
+  $('.save-article').on('click', function() {
+    console.log($(this).attr('data-id'));
+    $.post('/saveArticle', { id: $(this).attr('data-id') }, function(data) {
+      //
+    });
+  });
+
   // appends each article to the page
   function displayArticles(data) {
     console.log(data);
@@ -26,11 +33,15 @@ $(document).ready(function() {
               <a href="${article.link}" target="_blank">${article.title}</a> 
             </h3>
             <p class="mb-2">${article.excerpt}</p>
-            <button type="button" class="btn">Save Article</button>
+            <button type="button" class="btn" data-id="${article._id}">Save Article</button>
           </div>
         </div>
       `);
       $('.article-container').append(row);
     });
   }
+
+  // function saveArticle() {
+  //   $.pos
+  // }
 });
