@@ -1,13 +1,10 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-// Save a reference to the Schema constructor
 const Schema = mongoose.Schema;
 
 // Using the Schema constructor, create a new UserSchema object
-// This is similar to a Sequelize model
 const UserSchema = new Schema({
-  // `name` must be unique and of type String
   username: {
     type: String
   },
@@ -25,6 +22,7 @@ const UserSchema = new Schema({
       ref: 'Note'
     }
   ],
+  // stores an array of saved articles for each user
   savedArticles: [
     {
       type: Schema.Types.ObjectId,
@@ -33,18 +31,31 @@ const UserSchema = new Schema({
   ]
 });
 
-UserSchema.methods.savedArticle = function(articleId, userId) {
-  User.update({ _id: userId }, { $push: { savedArticles: articleId } }, { new: true })
-    .then(res => console.log(res))
-    .catch(err => console.log(err));
+// saves an article and associates it with the user.
+UserSchema.methods.savedArticle = function(articleId, userId, callback) {
+  User.update({ _id: userId }, { $addToSet: { savedArticles: articleId } }, { new: true })
+    .then(res => callback(res, null))
+    .catch(err => callback(null, res));
 };
 
+// gets all saved articles from the user.
 UserSchema.methods.getSavedArticles = function(userId, obj, callback) {
+  // passed in the object to render data to the view
+  // callback deals with success and error cases.
   const infoObject = obj;
   User.find({ _id: userId })
     .populate('savedArticles')
-    .then(res => callback(res, infoObject))
-    .catch(err => console.log(err));
+    .then(res => callback(res, null, infoObject))
+    .catch(err => callback(null, err, infoObject));
+};
+
+// removes the saved article from the user based on user id, and article id.
+UserSchema.methods.removeSavedArticle = function(articleId, userId, callback) {
+  // cb deals with success and error handling
+  // find the user, remove the articles based on the article id inside of the savedArticles array
+  User.update({ _id: userId }, { $pull: { savedArticles: { $in: [articleId] } } })
+    .then(result => callback(result, null))
+    .catch(err => callback(null, err));
 };
 
 // creates new user

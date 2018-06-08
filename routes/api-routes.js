@@ -71,12 +71,24 @@ router.get('/clear', (req, res) => {
     .catch(err => console.log('71:', err));
 });
 
+// associates an article to a user
 router.post('/saveArticle', (req, res) => {
-  console.log('userid:', req.user._id);
-  req.user.savedArticle(req.body.id, req.user._id);
-  res.end();
+  req.user.savedArticle(req.body.id, req.user._id, (response, error) => {
+    if (response) res.send('Article Saved');
+    if (error) res.status(500).send('An error ocurred while saving the article');
+  });
 });
 
+// deletes an article that is associated with a user
+router.delete('/removeArticle', (req, res) => {
+  req.user.removeSavedArticle(req.body.id, req.user._id, (response, error) => {
+    // sends success or error message to the user
+    if (response) res.send('Article Removed');
+    if (error) res.status(500).send('An error ocurred when removing the article');
+  });
+});
+
+// deals with registration, error handling, and authentication of a new user
 router.post('/register', (req, res) => {
   // checks for valid form input
   req.checkBody('username', 'Username is required').notEmpty();
@@ -94,9 +106,11 @@ router.post('/register', (req, res) => {
     res.redirect('/signup');
     // successful sign up
   } else {
+    // create a user without saving to the db to have access to the User methods
     const newUser = new User.User(req.body);
     newUser.checkIfUserExists(newUser, (err, result) => {
       if (err) throw err;
+      // if !result, then no users with that username exist, and the user can be created
       if (!result) {
         newUser.createUser(newUser, saved => {
           req.flash('success', 'Welcome, ');
@@ -114,6 +128,7 @@ router.post('/register', (req, res) => {
   }
 });
 
+// authenticates an existing user logging in. Handles success and failure cases.
 router.post(
   '/login',
   passport.authenticate('local', {
@@ -141,6 +156,7 @@ passport.deserializeUser(function(id, done) {
   });
 });
 
+// functions to handle authentication.
 passport.use(
   new LocalStrategy((username, password, done) => {
     const checkUser = new User.User({ username, password });

@@ -9,6 +9,8 @@ router.get('/', (req, res) => {
   const obj = {};
   const flashSuccess = req.flash('success')[0];
   obj.page = '/';
+  // displays a success message when the user signs in.
+  // checks if there is a user, and checks if there is a message.
   obj.success = req.user && flashSuccess ? flashSuccess + req.user.username : null;
   obj.logout = req.flash('logout')[0] || null;
   obj.isAuthenticated = req.isAuthenticated();
@@ -17,7 +19,6 @@ router.get('/', (req, res) => {
   db.Article.find()
     .then(articles => {
       obj.articles = articles;
-
       res.render('index', obj);
       obj.success = null;
     })
@@ -29,10 +30,12 @@ router.get('/saved', (req, res) => {
   const obj = {};
   obj.page = '/saved';
   obj.isAuthenticated = req.isAuthenticated();
-  req.user.getSavedArticles(req.user._id, obj, result => {
-    console.log(result[0].savedArticles);
-    obj.articles = result[0].savedArticles;
-    res.render('saved.hbs', obj);
+  req.user.getSavedArticles(req.user._id, obj, (result, error) => {
+    if (result) {
+      obj.articles = result[0].savedArticles;
+      res.render('saved.hbs', obj);
+    }
+    if (error) res.status(500).send('An error occured while loading saved articles');
   });
 });
 

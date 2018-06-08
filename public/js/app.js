@@ -8,10 +8,26 @@ $(document).ready(function() {
     });
   });
 
+  // saves an article to the user
   $('.save-article').on('click', function() {
-    console.log($(this).attr('data-id'));
+    var self = $(this);
     $.post('/saveArticle', { id: $(this).attr('data-id') }, function(data) {
-      //
+      // sends a message to the user saying it was saved, then removes the button
+      $(`<p class="text-success mt-2">${data}</p>`).insertAfter(self);
+      self.remove();
+    });
+  });
+
+  // remove saved article when the button is pressed. deletes the article associated to the user
+  $('.remove-article').on('click', function() {
+    var self = $(this);
+    $.ajax({
+      url: '/removeArticle',
+      data: { id: $(this).attr('data-id') },
+      type: 'DELETE',
+      success: function(result) {
+        self.closest('.article').remove();
+      }
     });
   });
 
@@ -40,8 +56,4 @@ $(document).ready(function() {
       $('.article-container').append(row);
     });
   }
-
-  // function saveArticle() {
-  //   $.pos
-  // }
 });

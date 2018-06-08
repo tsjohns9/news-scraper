@@ -6,9 +6,11 @@
     </p>
   {{/if}}
   {{#if errors}}
-    {{#each errors}}
-      <p class="text-danger">{{this.msg}}</p>
-    {{/each}}
+    <div class="py-2">
+      {{#each errors}}
+        <p class="text-danger">{{this.msg}}</p>
+      {{/each}}
+    </div>
   {{/if}}
   {{#if failure}}
     <p class="text-danger">{{failure}}</p>
