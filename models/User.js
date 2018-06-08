@@ -31,6 +31,12 @@ const UserSchema = new Schema({
   ]
 });
 
+// UserSchema.methods.saveNoteToUser = function(noteId, userId) {
+//   User.update({ _id: userId }, { $addToSet: { savedArticles: notes } }, { new: true })
+//     .then(res => callback(res, null))
+//     .catch(err => callback(null, res));
+// };
+
 // saves an article and associates it with the user.
 UserSchema.methods.savedArticle = function(articleId, userId, callback) {
   User.update({ _id: userId }, { $addToSet: { savedArticles: articleId } }, { new: true })

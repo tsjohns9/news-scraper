@@ -17,7 +17,8 @@
               <a href="{{link}}" target="_blank">{{title}}</a>
             </h3>
             <p class="mb-2">{{excerpt}}</p>
-            <button type="button" class="btn create-note" data-id="{{_id}}">Create Note</button>
+            <button type="button" class="btn create-note" data-toggle="modal" data-target="#save-note-modal" data-id="{{_id}}">Create Note</button>
+            <button type="button" class="btn view-note" data-id="{{_id}}">View Notes</button>
             <button type="button" class="btn remove-article" data-id="{{_id}}">Remove Article</button>
           </div>
         </div>
@@ -27,5 +28,30 @@
         <h2 class="text-center none">No Articles!</h2>
       </div>
   {{/if}}
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="save-note-modal" tabindex="-1" role="dialog" aria-labelledby="save-note-modal" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create Note</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <textarea name="new-note-text" class="form-control" id="new-note-text" rows="3"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary save-note">Create Note</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </div>

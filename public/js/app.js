@@ -1,4 +1,12 @@
 $(document).ready(function() {
+  var articleId = null;
+
+  // used to send the article id to the server when creating a new note
+  $('.create-note').on('click', function() {
+    articleId = $(this).attr('data-id');
+    console.log($(this).attr('data-id'));
+  });
+
   // performs get request for articles
   $('#scrape').on('click', function() {
     // server scrapes articles and returns the data here
@@ -28,6 +36,15 @@ $(document).ready(function() {
       success: function(result) {
         self.closest('.article').remove();
       }
+    });
+  });
+
+  $('.save-note').on('click', function(e) {
+    e.preventDefault();
+    $.post('/saveNote', { body: $('#new-note-text').val(), articleId: articleId }, function(
+      result
+    ) {
+      //
     });
   });
 

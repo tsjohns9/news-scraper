@@ -3,6 +3,7 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const db = require('../models');
 const User = db.User;
+const Note = db.Note;
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
@@ -40,7 +41,7 @@ router.get('/scrape', (req, res) => {
         // if the article title does not exist, then it saves the article
         // creates new article if it does not exist
         db.Article.update({ title: article.title }, { $set: article }, { upsert: true }).catch(
-          err => console.log('43:', err)
+          err => res.send(err)
         );
       });
     })
@@ -50,7 +51,7 @@ router.get('/scrape', (req, res) => {
         .then(articles => {
           res.json(articles);
         })
-        .catch(err => console.log('53:', err));
+        .catch(err => res.send(err));
     });
 });
 
@@ -68,15 +69,22 @@ router.get('/clear', (req, res) => {
     .then(result => {
       res.redirect('/');
     })
-    .catch(err => console.log('71:', err));
+    .catch(err => res.json(err));
 });
 
 // associates an article to a user
 router.post('/saveArticle', (req, res) => {
-  req.user.savedArticle(req.body.id, req.user._id, (response, error) => {
-    if (response) res.send('Article Saved');
-    if (error) res.status(500).send('An error ocurred while saving the article');
-  });
+  // prevents an attempt to save an article without being authenticated
+  if (req.user) {
+    // req.user is an instance of the User class. adds the article to the savedArticle array for the user
+    req.user.savedArticle(req.body.id, req.user._id, (response, error) => {
+      // success and err handling
+      if (response) res.send('Article Saved');
+      if (error) res.send('Could not save article');
+    });
+  } else {
+    res.send('Could not save article. You are not logged in');
+  }
 });
 
 // deletes an article that is associated with a user
@@ -84,8 +92,30 @@ router.delete('/removeArticle', (req, res) => {
   req.user.removeSavedArticle(req.body.id, req.user._id, (response, error) => {
     // sends success or error message to the user
     if (response) res.send('Article Removed');
-    if (error) res.status(500).send('An error ocurred when removing the article');
+    if (error) res.status(500).send('An error ocurred while removing the article');
   });
+});
+
+// saves a new note to the corresponding article. saves the noteId to the article based on id
+router.post('/saveNote', (req, res) => {
+  // creates a newNote document
+  const newNote = new Note({ username: req.user.username, body: req.body.body });
+  // saves the new document
+  newNote
+    .save()
+    .then(result => {
+      // saves the newNote _id to the notes array for the article
+      db.Article.update(
+        { _id: req.body.articleId },
+        { $addToSet: { notes: result._id } },
+        { new: true }
+      )
+        // success and err handling
+        .then(res => console.log(res))
+        .catch(err => console.log(err));
+    })
+    .catch(err => res.send(err));
+  console.log(req.body);
 });
 
 // deals with registration, error handling, and authentication of a new user
