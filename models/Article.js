@@ -27,6 +27,14 @@ const ArticleSchema = new Schema({
   ]
 });
 
+// gets all article notes for a specified article
+ArticleSchema.statics.getAllNotes = function(articleId, callback) {
+  Article.find({ _id: articleId })
+    .populate('notes')
+    .then(res => callback(res[0].notes, null))
+    .catch(err => callback(null, res));
+};
+
 // This creates our model from the above schema, using mongoose's model method
 const Article = mongoose.model('Article', ArticleSchema);
 

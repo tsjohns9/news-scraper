@@ -18,7 +18,7 @@
             </h3>
             <p class="mb-2">{{excerpt}}</p>
             <button type="button" class="btn create-note" data-toggle="modal" data-target="#save-note-modal" data-id="{{_id}}">Create Note</button>
-            <button type="button" class="btn view-note" data-id="{{_id}}">View Notes</button>
+            <button type="button" class="btn view-note" data-toggle="modal" data-target="#view-notes-modal" data-id="{{_id}}">View Notes</button>
             <button type="button" class="btn remove-article" data-id="{{_id}}">Remove Article</button>
           </div>
         </div>
@@ -31,7 +31,7 @@
   </div>
 </div>
 
-<!-- Modal -->
+{{!-- <!-- Save Note Modal --> --}}
 <div class="modal fade" id="save-note-modal" tabindex="-1" role="dialog" aria-labelledby="save-note-modal" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -51,6 +51,34 @@
             <button type="submit" class="btn btn-primary save-note">Create Note</button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{!-- View Notes Modal --}}
+
+{{!-- <!-- Button trigger modal --> --}}
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong">
+  Launch demo modal
+</button>
+
+{{!-- <!-- Modal --> --}}
+<div class="modal fade" id="view-notes-modal" tabindex="-1" role="dialog" aria-labelledby="view-notes-modal" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Article Notes</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="all-article-notes">
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
       </div>
     </div>
   </div>

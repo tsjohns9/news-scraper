@@ -4,12 +4,10 @@ $(document).ready(function() {
   // used to send the article id to the server when creating a new note
   $('.create-note').on('click', function() {
     articleId = $(this).attr('data-id');
-    console.log($(this).attr('data-id'));
   });
 
   // performs get request for articles
   $('#scrape').on('click', function() {
-    // server scrapes articles and returns the data here
     $.getJSON('/scrape', function(data) {
       // creates each article
       displayArticles(data);
@@ -39,13 +37,35 @@ $(document).ready(function() {
     });
   });
 
+  // sends new note info to db. shows result message
   $('.save-note').on('click', function(e) {
     e.preventDefault();
     $.post('/saveNote', { body: $('#new-note-text').val(), articleId: articleId }, function(
       result
     ) {
-      //
+      $('#new-note-text').val('');
+      $('#new-note-text').hide();
+      $('.form-group').append(`<h3 id="result-msg">${result}</h3>`);
     });
+  });
+
+  $('.view-note').on('click', function() {
+    $.post('/getArticleNotes', { articleId: $(this).attr('data-id') }, function(result) {
+      $('.all-article-notes').empty();
+      result.forEach(note => {
+        console.log(note);
+        var noteP = $(`
+          <p class=""><b>${note.username}:</b> ${note.body}</p>
+        `);
+        $('#all-article-notes').append(noteP);
+      });
+    });
+  });
+
+  // removes result message on close and brings back the textarea
+  $('#save-note-modal').on('hidden.bs.modal', function(e) {
+    $('#result-msg').remove();
+    $('#new-note-text').show();
   });
 
   // appends each article to the page

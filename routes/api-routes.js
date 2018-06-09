@@ -92,7 +92,7 @@ router.delete('/removeArticle', (req, res) => {
   req.user.removeSavedArticle(req.body.id, req.user._id, (response, error) => {
     // sends success or error message to the user
     if (response) res.send('Article Removed');
-    if (error) res.status(500).send('An error ocurred while removing the article');
+    if (error) res.send('An error ocurred while removing the article');
   });
 });
 
@@ -100,22 +100,40 @@ router.delete('/removeArticle', (req, res) => {
 router.post('/saveNote', (req, res) => {
   // creates a newNote document
   const newNote = new Note({ username: req.user.username, body: req.body.body });
+  // will hold the noteId once it is created so that it can be used to save to the user
+  let noteId = null;
   // saves the new document
   newNote
     .save()
     .then(result => {
+      noteId = result._id;
       // saves the newNote _id to the notes array for the article
-      db.Article.update(
+      db.Article.findOneAndUpdate(
         { _id: req.body.articleId },
-        { $addToSet: { notes: result._id } },
+        { $addToSet: { notes: noteId } },
         { new: true }
       )
-        // success and err handling
-        .then(res => console.log(res))
-        .catch(err => console.log(err));
+        // save note to the user
+        .then(updatedArticleRes => {
+          req.user.saveNoteToUser(noteId, req.user._id, (result, error) => {
+            // sends success or error message to the user
+            if (result) res.send('Note Saved');
+            if (error) res.send('An error ocurred while saving the note');
+          });
+        })
+        .catch(err => res.send(err));
     })
     .catch(err => res.send(err));
   console.log(req.body);
+});
+
+// gets all article notes based on articleId
+router.post('/getArticleNotes', (req, res) => {
+  const articleId = req.body.articleId;
+  db.Article.getAllNotes(articleId, (result, error) => {
+    if (result) res.send(result);
+    if (error) res.send('An error ocurred while retrieving the notes');
+  });
 });
 
 // deals with registration, error handling, and authentication of a new user

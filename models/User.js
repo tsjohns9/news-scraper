@@ -31,11 +31,11 @@ const UserSchema = new Schema({
   ]
 });
 
-// UserSchema.methods.saveNoteToUser = function(noteId, userId) {
-//   User.update({ _id: userId }, { $addToSet: { savedArticles: notes } }, { new: true })
-//     .then(res => callback(res, null))
-//     .catch(err => callback(null, res));
-// };
+UserSchema.methods.saveNoteToUser = function(noteId, userId, callback) {
+  User.update({ _id: userId }, { $addToSet: { notes: noteId } }, { new: true })
+    .then(res => callback(res, null))
+    .catch(err => callback(null, err));
+};
 
 // saves an article and associates it with the user.
 UserSchema.methods.savedArticle = function(articleId, userId, callback) {
