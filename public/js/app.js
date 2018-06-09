@@ -5,6 +5,13 @@ $(document).ready(function() {
     // Animation complete.
   });
 
+  // removes result message on close and brings back the textarea for the save-note modal.
+  $('#save-note-modal').on('hidden.bs.modal', function(e) {
+    $('#result-msg').remove();
+    $('#new-note-text').show();
+    $('.save-note').show();
+  });
+
   // used to send the article id to the server when creating a new note
   $('.create-note, .view-note').on('click', function() {
     articleId = $(this).attr('data-id');
@@ -43,6 +50,7 @@ $(document).ready(function() {
         self.closest('.article').remove();
         if ($('.saved-articles').children().length < 1) {
           $('.article-container').empty();
+          $('.article-container').append($(`<h2 class="text-center none">No Articles!</h2>`));
         }
       }
     });
@@ -156,13 +164,6 @@ $(document).ready(function() {
         console.log(result);
       }
     });
-  });
-
-  // removes result message on close and brings back the textarea for the save-note modal.
-  $('#save-note-modal').on('hidden.bs.modal', function(e) {
-    $('#result-msg').remove();
-    $('#new-note-text').show();
-    $('.save-note').show();
   });
 
   // appends each article to the page
