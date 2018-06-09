@@ -32,7 +32,7 @@ ArticleSchema.statics.getAllNotes = function(articleId, callback) {
   Article.find({ _id: articleId })
     .populate('notes')
     .then(res => callback(res[0].notes, null))
-    .catch(err => callback(null, res));
+    .catch(err => callback(null, err));
 };
 
 // removes note associated with an article

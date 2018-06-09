@@ -1,6 +1,10 @@
 $(document).ready(function() {
   var articleId = null;
 
+  $('.text-success').fadeOut(1800, function() {
+    // Animation complete.
+  });
+
   // used to send the article id to the server when creating a new note
   $('.create-note, .view-note').on('click', function() {
     articleId = $(this).attr('data-id');
@@ -8,7 +12,9 @@ $(document).ready(function() {
 
   // gets articles from the onion, and displays them
   $('#scrape').on('click', function() {
+    $('.article-container').append(`<div class="loader"></div>`);
     $.getJSON('/scrape', function(data) {
+      $('.article-container').empty();
       // creates each article
       displayArticles(data);
     });
@@ -35,6 +41,9 @@ $(document).ready(function() {
       success: function(result) {
         // removes the div containing the article
         self.closest('.article').remove();
+        if ($('.saved-articles').children().length < 1) {
+          $('.article-container').empty();
+        }
       }
     });
   });
@@ -65,8 +74,16 @@ $(document).ready(function() {
 
   // gets all notes from the db for an article based on the articleId.
   $('.view-note').on('click', function() {
+    // removes the previous notes on each click
+    $('#all-article-notes').empty();
+
+    // displays loader if results are not immediate
+    $('#all-article-notes').append(`<div class="loader"></div>`);
+
+    // sends data to get the notes associated with the article
     $.post('/getArticleNotes', { articleId: $(this).attr('data-id') }, function(result) {
       // checking the type ensures the request for the notes was successful.
+
       // if it was unsuccessful the type will be a string.
       if (typeof result === 'object') {
         // contains the authenticated user from the server
@@ -76,7 +93,7 @@ $(document).ready(function() {
         var result = result.result;
 
         // clears notes when the button is pressed before appending new notes
-        $('#all-article-notes').empty();
+        $('.loader').remove();
 
         // displays message if no notes are found
         if (result.length < 1) {

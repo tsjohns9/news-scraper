@@ -25,6 +25,7 @@ h3 {
 
 .btn {
   background-color: $primary;
+  border-color: $primary;
   border-radius: 0 !important;
   color: white;
 
@@ -44,4 +45,11 @@ h3 {
 
 .close { 
     opacity: 1;
+}
+
+.form-control:focus {
+    background-color: #fff;
+    border-color: #3f74ad;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(58, 110, 165, 0.25);
 }

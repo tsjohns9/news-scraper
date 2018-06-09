@@ -3,8 +3,27 @@
   max-width: 300px !important;
 }
 
+.view-note {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.create-note,
+.remove-article, {
+  @extend .view-note;
+}
+
+
 @media (min-width: 768px) {
   h3 {
     font-size: 1.75rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .view-note,
+  .create-note,
+  .remove-article {
+    width: auto;
   }
 }

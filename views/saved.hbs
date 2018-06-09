@@ -17,9 +17,12 @@
               <a href="{{link}}" target="_blank">{{title}}</a>
             </h3>
             <p class="mb-2">{{excerpt}}</p>
+            <div class="col sm-4">
+
             <button type="button" class="btn create-note" data-toggle="modal" data-target="#save-note-modal" data-id="{{_id}}">Create Note</button>
             <button type="button" class="btn view-note" data-toggle="modal" data-target="#view-notes-modal" data-id="{{_id}}">View Notes</button>
             <button type="button" class="btn remove-article" data-id="{{_id}}">Remove Article</button>
+            </div>
           </div>
         </div>
       {{/each}} 
@@ -48,7 +51,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary save-note">Create Note</button>
+            <button type="submit" class="btn save-note">Create Note</button>
           </div>
         </form>
       </div>
