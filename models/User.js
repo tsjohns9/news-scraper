@@ -98,11 +98,11 @@ UserSchema.methods.findByUserName = function(user, callback) {
   User.findOne({ username: user }, callback);
 };
 
-function getUserById(id, callback) {
+UserSchema.statics.getUserById = function(id, callback) {
   User.findById(id, callback);
-}
+};
 // This creates our model from the above schema, using mongoose's model method
 const User = mongoose.model('User', UserSchema);
 
 // Export the User model
-module.exports = { User, getUserById };
+module.exports = User;

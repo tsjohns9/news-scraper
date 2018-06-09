@@ -7,6 +7,7 @@ const Note = db.Note;
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
+// gets articles from the onion
 router.get('/scrape', (req, res) => {
   axios
     .get('https://www.theonion.com/c/news-in-brief')
@@ -55,24 +56,18 @@ router.get('/scrape', (req, res) => {
     });
 });
 
-// get specific article from db
-router.get('/articles/:id', (req, res) => {
-  db.Article.findOne({ _id: req.params.id })
-    // .populate('notes)
-    .then(article => res.json(article))
-    .catch(err => res.json(err));
-});
-
 // clears all articles
 router.get('/clear', (req, res) => {
   db.Article.deleteMany({})
-    .then(result => {
-      res.redirect('/');
+    .then(() => {
+      User.deleteMany({}).then(() => {
+        Note.deleteMany({}).then(() => res.redirect('/'));
+      });
     })
     .catch(err => res.json(err));
 });
 
-// associates an article to a user
+// associates an article to a user when the save article button is pressed
 router.post('/saveArticle', (req, res) => {
   // prevents an attempt to save an article without being authenticated
   if (req.user) {
@@ -98,22 +93,28 @@ router.delete('/removeArticle', (req, res) => {
 
 // saves a new note to the corresponding article. saves the noteId to the article based on id
 router.post('/saveNote', (req, res) => {
-  // creates a newNote document
+  // creates a new Note document
   const newNote = new Note({ username: req.user.username, body: req.body.body });
+
   // will hold the noteId once it is created so that it can be used to save to the user
   let noteId = null;
+
   // saves the new document
   newNote
     .save()
+    // contains the result of the saved note after its saved to the db
     .then(result => {
+      // sets the noteId variable so it can be used outside of this scope
       noteId = result._id;
+
       // saves the newNote _id to the notes array for the article
       db.Article.findOneAndUpdate(
         { _id: req.body.articleId },
+        // adds note to the array saved on the Article document
         { $addToSet: { notes: noteId } },
         { new: true }
       )
-        // save note to the user
+        // save note to the user once the note has been saved to the article
         .then(updatedArticleRes => {
           req.user.saveNoteToUser(noteId, req.user._id, (result, error) => {
             // sends success or error message to the user
@@ -124,21 +125,19 @@ router.post('/saveNote', (req, res) => {
         .catch(err => res.send(err));
     })
     .catch(err => res.send(err));
-  console.log(req.body);
 });
 
 // gets all article notes based on articleId
 router.post('/getArticleNotes', (req, res) => {
-  const articleId = req.body.articleId;
-  db.Article.getAllNotes(articleId, (result, error) => {
-    if (result) res.send(result);
+  db.Article.getAllNotes(req.body.articleId, (result, error) => {
+    if (result) res.send({ username: req.user.username, result: result });
     if (error) res.send('An error ocurred while retrieving the notes');
   });
 });
 
 // deals with registration, error handling, and authentication of a new user
 router.post('/register', (req, res) => {
-  // checks for valid form input
+  // checks for valid form input and sends message to client if a field is invalid
   req.checkBody('username', 'Username is required').notEmpty();
   req.checkBody('username', 'Username must be at least 4 characters').isLength({ min: 4 });
   req.checkBody('password', 'Password is required').notEmpty();
@@ -155,7 +154,7 @@ router.post('/register', (req, res) => {
     // successful sign up
   } else {
     // create a user without saving to the db to have access to the User methods
-    const newUser = new User.User(req.body);
+    const newUser = new User(req.body);
     newUser.checkIfUserExists(newUser, (err, result) => {
       if (err) throw err;
       // if !result, then no users with that username exist, and the user can be created
@@ -207,7 +206,7 @@ passport.deserializeUser(function(id, done) {
 // functions to handle authentication.
 passport.use(
   new LocalStrategy((username, password, done) => {
-    const checkUser = new User.User({ username, password });
+    const checkUser = new User({ username, password });
     // checks for existing user
     checkUser.findByUserName(username, (err, user) => {
       if (err) throw err;

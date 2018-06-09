@@ -40,6 +40,10 @@ h3 {
   cursor: pointer;
 }
 
+.close {
+  opacity: 1;
+}
+
 .jumbotron {
   background: url("../img/pattern.png");
   border-radius: 0 !important;

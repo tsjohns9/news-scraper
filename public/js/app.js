@@ -6,7 +6,7 @@ $(document).ready(function() {
     articleId = $(this).attr('data-id');
   });
 
-  // performs get request for articles
+  // gets articles from the onion, and displays them
   $('#scrape').on('click', function() {
     $.getJSON('/scrape', function(data) {
       // creates each article
@@ -17,14 +17,15 @@ $(document).ready(function() {
   // saves an article to the user
   $('.save-article').on('click', function() {
     var self = $(this);
+    // sends article id to the server to save article to the user
     $.post('/saveArticle', { id: $(this).attr('data-id') }, function(data) {
-      // sends a message to the user saying it was saved, then removes the button
+      // sends a message to the user saying it was saved, then removes the save article button
       $(`<p class="text-success mt-2">${data}</p>`).insertAfter(self);
       self.remove();
     });
   });
 
-  // remove saved article when the button is pressed. deletes the article associated to the user
+  // remove saved article based on articleId when the button is pressed. deletes the article associated to the user
   $('.remove-article').on('click', function() {
     var self = $(this);
     $.ajax({
@@ -32,47 +33,99 @@ $(document).ready(function() {
       data: { id: $(this).attr('data-id') },
       type: 'DELETE',
       success: function(result) {
+        // removes the div containing the article
         self.closest('.article').remove();
       }
     });
   });
 
-  // sends new note info to db. shows result message
+  // sends new note info to db, and articleId when the save-note button is pressed in the modal. shows result message
   $('.save-note').on('click', function(e) {
     e.preventDefault();
     $.post('/saveNote', { body: $('#new-note-text').val(), articleId: articleId }, function(
       result
     ) {
+      // clears out the last entered note
       $('#new-note-text').val('');
+      // hides the text area
       $('#new-note-text').hide();
+      // displays a success or fail message
       $('.form-group').append(`<h3 id="result-msg">${result}</h3>`);
+      // removes the save note button after a note has been saved
+      $('.save-note').hide();
     });
   });
 
+  // gets all notes from the db for an article based on the articleId.
   $('.view-note').on('click', function() {
     $.post('/getArticleNotes', { articleId: $(this).attr('data-id') }, function(result) {
-      $('.all-article-notes').empty();
-      result.forEach(note => {
-        console.log(note);
-        var noteP = $(`
-          <p class=""><b>${note.username}:</b> ${note.body}</p>
-        `);
-        $('#all-article-notes').append(noteP);
-      });
+      // checking the type ensures the request for the notes was successful.
+      // if it was unsuccessful the type will be a string.
+      if (typeof result === 'object') {
+        // contains the authenticated user from the server
+        var username = result.username;
+
+        // contains the notes from the server
+        var result = result.result;
+
+        // clears notes when the button is pressed before appending new notes
+        $('#all-article-notes').empty();
+
+        // displays message if no notes are found
+        if (result.length < 1) {
+          $('#all-article-notes').append($(`<h3>No Notes</h3>`));
+        }
+
+        // appends each note to the modal from the db query
+        result.forEach(note => {
+          // creates the main note content
+          var noteContent = $(`
+            <div class="mb-2 note-container">
+              <span><span class="text-muted">${note.username}:</span> ${note.body}</span>
+            </div>
+          `);
+
+          // if the authenticated user matches the note username, then the user can remove their own note
+          if (username === note.username) {
+            // creates remove note button
+            noteContent.append(
+              $(`
+              <button type="button" class="close" aria-label="Close">
+                <span aria-hidden="true"  
+                  style="padding: 0 7px; color: white; background-color: #f44336">
+                    ×
+                </span>
+              </button>
+              `)
+            );
+          }
+
+          // appends to notes modal
+          $('#all-article-notes').append(noteContent);
+        });
+      } else {
+        // if this runs, then we did not get a successful response. appends error message
+        $('#all-article-notes').append(result);
+      }
     });
   });
 
-  // removes result message on close and brings back the textarea
+  // removes result message on close and brings back the textarea for the save-note modal.
   $('#save-note-modal').on('hidden.bs.modal', function(e) {
     $('#result-msg').remove();
     $('#new-note-text').show();
+    $('.save-note').show();
   });
 
   // appends each article to the page
   function displayArticles(data) {
-    console.log(data);
+    // removes old articles before appending
     $('.saved-articles').empty();
+
+    // removes message that says 'No Articles' on home page when there are no articles
     $('.none').remove();
+
+    // creates each article container with its content
     data.forEach(article => {
       var row = $(`
         <div class="row article my-5 pb-4">
