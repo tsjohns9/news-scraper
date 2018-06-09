@@ -2,7 +2,7 @@ $(document).ready(function() {
   var articleId = null;
 
   // used to send the article id to the server when creating a new note
-  $('.create-note').on('click', function() {
+  $('.create-note, .view-note').on('click', function() {
     articleId = $(this).attr('data-id');
   });
 
@@ -42,18 +42,25 @@ $(document).ready(function() {
   // sends new note info to db, and articleId when the save-note button is pressed in the modal. shows result message
   $('.save-note').on('click', function(e) {
     e.preventDefault();
-    $.post('/saveNote', { body: $('#new-note-text').val(), articleId: articleId }, function(
-      result
-    ) {
-      // clears out the last entered note
-      $('#new-note-text').val('');
-      // hides the text area
-      $('#new-note-text').hide();
-      // displays a success or fail message
-      $('.form-group').append(`<h3 id="result-msg">${result}</h3>`);
-      // removes the save note button after a note has been saved
-      $('.save-note').hide();
-    });
+    $.post(
+      '/saveNote',
+      {
+        body: $('#new-note-text')
+          .val()
+          .trim(),
+        articleId: articleId
+      },
+      function(result) {
+        // clears out the last entered note
+        $('#new-note-text').val('');
+        // hides the text area
+        $('#new-note-text').hide();
+        // displays a success or fail message
+        $('.form-group').append(`<h3 id="result-msg">${result}</h3>`);
+        // removes the save note button after a note has been saved
+        $('.save-note').hide();
+      }
+    );
   });
 
   // gets all notes from the db for an article based on the articleId.
@@ -90,7 +97,9 @@ $(document).ready(function() {
             // creates remove note button
             noteContent.append(
               $(`
-              <button type="button" class="close" aria-label="Close">
+              <button type="button" class="close delete-note" aria-label="Close" data-id="${
+                note._id
+              }">
                 <span aria-hidden="true"  
                   style="padding: 0 7px; color: white; background-color: #f44336">
                     ×
@@ -106,6 +115,28 @@ $(document).ready(function() {
       } else {
         // if this runs, then we did not get a successful response. appends error message
         $('#all-article-notes').append(result);
+      }
+    });
+  });
+
+  // removes a users note from an article
+  $(document).on('click', '.delete-note', function() {
+    var self = $(this);
+    $.post('/removeNote', { noteId: $(this).attr('data-id'), articleId: articleId }, function(
+      result
+    ) {
+      // deletes the note from the page
+      if (result === 'success') {
+        self.closest('.note-container').remove();
+
+        // if there are no notes, inform the user
+        if ($('#all-article-notes').children().length < 1) {
+          $('#all-article-notes').append($(`<h3>No Notes</h3>`));
+        }
+
+        // writes to the console if an error occured while removing a note
+      } else {
+        console.log(result);
       }
     });
   });

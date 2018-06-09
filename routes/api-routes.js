@@ -56,7 +56,7 @@ router.get('/scrape', (req, res) => {
     });
 });
 
-// clears all articles
+// clears the db
 router.get('/clear', (req, res) => {
   db.Article.deleteMany({})
     .then(() => {
@@ -110,19 +110,12 @@ router.post('/saveNote', (req, res) => {
       // saves the newNote _id to the notes array for the article
       db.Article.findOneAndUpdate(
         { _id: req.body.articleId },
-        // adds note to the array saved on the Article document
         { $addToSet: { notes: noteId } },
         { new: true }
       )
         // save note to the user once the note has been saved to the article
-        .then(updatedArticleRes => {
-          req.user.saveNoteToUser(noteId, req.user._id, (result, error) => {
-            // sends success or error message to the user
-            if (result) res.send('Note Saved');
-            if (error) res.send('An error ocurred while saving the note');
-          });
-        })
-        .catch(err => res.send(err));
+        .then(() => res.send('Note Saved'))
+        .catch(() => res.send('Could not save note'));
     })
     .catch(err => res.send(err));
 });
@@ -132,6 +125,25 @@ router.post('/getArticleNotes', (req, res) => {
   db.Article.getAllNotes(req.body.articleId, (result, error) => {
     if (result) res.send({ username: req.user.username, result: result });
     if (error) res.send('An error ocurred while retrieving the notes');
+  });
+});
+
+// removes a note from an article and from the notes collection
+router.post('/removeNote', (req, res) => {
+  // first removes the note from the articles array. then removes the note from the notes collection
+  db.Article.removeNote(req.body.articleId, req.body.noteId, (result, error) => {
+    // removes from the note collection in the callback
+    if (result) {
+      Note.remove({ _id: req.body.noteId })
+        .then(removeRes => {
+          // if the write result removed value is greater than 0, then it was a success
+          if (removeRes.n > 0) res.send('success');
+          // if not, then there was an error
+          else res.send('An error occured while trying to remove the note');
+        })
+        .catch(err => console.log(err));
+    }
+    if (error) res.send('An error occured while trying to remove the note');
   });
 });
 

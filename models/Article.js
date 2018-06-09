@@ -35,6 +35,13 @@ ArticleSchema.statics.getAllNotes = function(articleId, callback) {
     .catch(err => callback(null, res));
 };
 
+// removes note associated with an article
+ArticleSchema.statics.removeNote = function(articleId, noteId, callback) {
+  Article.update({ _id: articleId }, { $pull: { notes: { $in: [noteId] } } })
+    .then(result => callback(result, null))
+    .catch(err => callback(null, err));
+};
+
 // This creates our model from the above schema, using mongoose's model method
 const Article = mongoose.model('Article', ArticleSchema);
 

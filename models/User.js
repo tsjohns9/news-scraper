@@ -11,17 +11,7 @@ const UserSchema = new Schema({
   password: {
     type: String
   },
-  // `notes` is an array that stores ObjectIds
-  // The ref property links these ObjectIds to the Note model
-  // This allows us to populate the User with any associated Notes
-  notes: [
-    {
-      // Store ObjectIds in the array
-      type: Schema.Types.ObjectId,
-      // The ObjectIds will refer to the ids in the Note model
-      ref: 'Note'
-    }
-  ],
+
   // stores an array of saved articles for each user
   savedArticles: [
     {
@@ -30,12 +20,6 @@ const UserSchema = new Schema({
     }
   ]
 });
-
-UserSchema.methods.saveNoteToUser = function(noteId, userId, callback) {
-  User.update({ _id: userId }, { $addToSet: { notes: noteId } }, { new: true })
-    .then(res => callback(res, null))
-    .catch(err => callback(null, err));
-};
 
 // saves an article and associates it with the user.
 UserSchema.methods.savedArticle = function(articleId, userId, callback) {
@@ -82,6 +66,7 @@ UserSchema.methods.createUser = function(newUser, callback) {
   });
 };
 
+// checks if a user exists at sign up
 UserSchema.methods.checkIfUserExists = function(potentialUser, callback) {
   User.findOne({ username: potentialUser.username }, callback);
 };
@@ -98,6 +83,7 @@ UserSchema.methods.findByUserName = function(user, callback) {
   User.findOne({ username: user }, callback);
 };
 
+// passport uses this to serialize and de-serialize a session
 UserSchema.statics.getUserById = function(id, callback) {
   User.findById(id, callback);
 };
