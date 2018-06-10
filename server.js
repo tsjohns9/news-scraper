@@ -3,13 +3,10 @@ const flash = require('connect-flash');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const exphbs = require('express-handlebars');
-const axios = require('axios');
-const cheerio = require('cheerio');
 const cookieParser = require('cookie-parser');
 const expressValidator = require('express-validator');
 const session = require('express-session');
 const passport = require('passport');
-const LocalStrategy = require('passport-local').strategy;
 
 // Initialize Express
 const app = express();
@@ -62,6 +59,15 @@ mongoose.connect('mongodb://localhost/news-scrapper');
 
 app.use(require('./routes/html-routes'));
 app.use(require('./routes/api-routes'));
+
+// 404 redirect
+app.get('*', (req, res) => {
+  const obj = {};
+  // used to render url path for requested resource on a 404 page
+  obj.requested = req.originalUrl;
+  obj.page = '/404';
+  res.render('404', obj);
+});
 
 // starts the server
 app.listen(PORT, function() {

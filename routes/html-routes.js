@@ -28,37 +28,64 @@ router.get('/', (req, res) => {
 // loads saved articles for the user
 router.get('/saved', (req, res) => {
   const obj = {};
-  obj.page = '/saved';
   obj.isAuthenticated = req.isAuthenticated();
-  req.user.getSavedArticles(req.user._id, obj, (result, error) => {
-    if (result) {
-      obj.articles = result[0].savedArticles;
-      res.render('saved.hbs', obj);
-    }
-    if (error) res.status(500).send('An error occured while loading saved articles');
-  });
+
+  // retrieves saved articles for the user if they are authenticated
+  if (obj.isAuthenticated) {
+    obj.page = '/saved';
+    req.user.getSavedArticles(req.user._id, obj, (result, error) => {
+      if (result) {
+        obj.articles = result[0].savedArticles;
+        res.render('saved.hbs', obj);
+      }
+      if (error) res.status(500).send('An error occured while loading saved articles');
+    });
+
+    // this will render a 403 page if the user is not authenticated
+  } else {
+    obj.page = '/403';
+    res.render('403', obj);
+  }
 });
 
 // signup page
 router.get('/signup', (req, res) => {
   const obj = {};
-  obj.page = '/signup';
   obj.isAuthenticated = req.isAuthenticated();
-  obj.errors = req.session.errors || null;
-  obj.failure = req.flash('failure')[0] || null;
-  res.render('signup.hbs', obj);
-  req.session.errors = null;
+
+  // only displays sign up page if the user has not authenticated
+  if (!obj.isAuthenticated) {
+    obj.page = '/signup';
+    obj.errors = req.session.errors || null;
+    obj.failure = req.flash('failure')[0] || null;
+    res.render('signup.hbs', obj);
+    req.session.errors = null;
+
+    // prevents an authenticated user from trying to sign up again
+  } else {
+    obj.page = '/403';
+    res.render('403', obj);
+  }
 });
 
 // login page
 router.get('/login', (req, res) => {
   const obj = {};
-  obj.page = '/login';
   obj.isAuthenticated = req.isAuthenticated();
-  obj.errors = req.session.errors || null;
-  obj.failure = req.flash('error')[0] || null;
-  res.render('login.hbs', obj);
-  req.session.errors = null;
+
+  // allows access to the login page if the user is not authenticated
+  if (!obj.isAuthenticated) {
+    obj.page = '/login';
+    obj.errors = req.session.errors || null;
+    obj.failure = req.flash('error')[0] || null;
+    res.render('login.hbs', obj);
+    req.session.errors = null;
+
+    // prevents an authenticated user from trying to log in again
+  } else {
+    obj.page = '/403';
+    res.render('403', obj);
+  }
 });
 
 router.get('/logout', (req, res) => {

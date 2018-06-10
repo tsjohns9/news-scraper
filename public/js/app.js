@@ -19,6 +19,7 @@ $(document).ready(function() {
 
   // gets articles from the onion, and displays them
   $('#scrape').on('click', function() {
+    $('.article-container').empty();
     $('.article-container').append(`<div class="loader"></div>`);
     $.getJSON('/scrape', function(data) {
       $('.article-container').empty();

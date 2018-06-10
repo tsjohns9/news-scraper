@@ -1,6 +1,8 @@
 <div class="jumbotron">
   <h1 class="display-4 text-center">
-    {{#ifEquals page "/saved"}} Saved Articles{{/ifEquals}}
     {{#ifEquals page "/"}} Scrape The Onion{{/ifEquals}}
+    {{#ifEquals page "/saved"}} Saved Articles{{/ifEquals}}
+    {{#ifEquals page "/404"}} 404 Page Not Found{{/ifEquals}}
+    {{#ifEquals page "/403"}} 403 Permission Denied {{/ifEquals}}
   </h1>
 </div>
