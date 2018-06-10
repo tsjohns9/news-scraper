@@ -47,7 +47,7 @@ router.get('/scrape', (req, res) => {
       });
     })
     .then(() => {
-      // sends each article to the front end to be rendered
+      // sends each article to the front end to be rendered once all articles are saved to the db
       db.Article.find()
         .then(articles => {
           res.json(articles);
@@ -71,24 +71,26 @@ router.get('/clear', (req, res) => {
 router.post('/saveArticle', (req, res) => {
   // prevents an attempt to save an article without being authenticated
   if (req.user) {
-    // req.user is an instance of the User class. adds the article to the savedArticle array for the user
-    req.user.savedArticle(req.body.id, req.user._id, (response, error) => {
-      // success and err handling
-      if (response) res.send('Article Saved');
-      if (error) res.send('Could not save article');
-    });
+    // saves to the savedArticles array on the User schema
+    User.update({ _id: req.user._id }, { $addToSet: { savedArticles: req.body.id } }, { new: true })
+      // success and error handling
+      .then(result => {
+        if (result.nModified === 1) res.send('Article Saved');
+        else res.send('Article already saved');
+      })
+      .catch(() => res.send('Could not save article'));
+
+    // runs if a user didn't authenticate when trying to save an article
   } else {
     res.send('Could not save article. You are not logged in');
   }
 });
 
-// deletes an article that is associated with a user
+// deletes an article that is associated with a user by removing from the savedArticles array
 router.delete('/removeArticle', (req, res) => {
-  req.user.removeSavedArticle(req.body.id, req.user._id, (response, error) => {
-    // sends success or error message to the user
-    if (response) res.send('Article Removed');
-    if (error) res.send('An error ocurred while removing the article');
-  });
+  User.update({ _id: req.user._id }, { $pull: { savedArticles: { $in: [req.body.id] } } })
+    .then(() => res.send('Article Removed'))
+    .catch(() => res.send('An error ocurred while removing the article'));
 });
 
 // saves a new note to the corresponding article. saves the noteId to the article based on id
@@ -122,29 +124,27 @@ router.post('/saveNote', (req, res) => {
 
 // gets all article notes based on articleId
 router.post('/getArticleNotes', (req, res) => {
-  db.Article.getAllNotes(req.body.articleId, (result, error) => {
-    if (result) res.send({ username: req.user.username, result: result });
-    if (error) res.send('An error ocurred while retrieving the notes');
-  });
+  db.Article.find({ _id: req.body.articleId })
+    .populate('notes')
+    .then(result => res.send({ username: req.user.username, result: result[0].notes }))
+    .catch(() => res.send('An error ocurred while retrieving the notes'));
 });
 
 // removes a note from an article and from the notes collection
 router.post('/removeNote', (req, res) => {
-  // first removes the note from the articles array. then removes the note from the notes collection
-  db.Article.removeNote(req.body.articleId, req.body.noteId, (result, error) => {
-    // removes from the note collection in the callback
-    if (result) {
-      Note.remove({ _id: req.body.noteId })
-        .then(removeRes => {
-          // if the write result removed value is greater than 0, then it was a success
-          if (removeRes.n > 0) res.send('success');
-          // if not, then there was an error
-          else res.send('An error occured while trying to remove the note');
-        })
-        .catch(err => console.log(err));
-    }
-    if (error) res.send('An error occured while trying to remove the note');
-  });
+  db.Article.update({ _id: req.body.articleId }, { $pull: { notes: { $in: [req.body.noteId] } } })
+    .then(removeRes => {
+      // if the write result removed value is greater than 0, then it was a success
+      if (removeRes.n > 0) {
+        res.send('success');
+      }
+
+      // if not, then there was an error
+      else {
+        res.send('An error occured while trying to remove the note');
+      }
+    })
+    .catch(() => res.send('An error occured while trying to remove the note'));
 });
 
 // deals with registration, error handling, and authentication of a new user
@@ -163,27 +163,26 @@ router.post('/register', (req, res) => {
   if (errors) {
     req.session.errors = errors;
     res.redirect('/signup');
-    // successful sign up
+    // successful sign up if there were no errors
   } else {
-    // create a user without saving to the db to have access to the User methods
-    const newUser = new User(req.body);
-    newUser.checkIfUserExists(newUser, (err, result) => {
-      if (err) throw err;
-      // if !result, then no users with that username exist, and the user can be created
-      if (!result) {
-        newUser.createUser(newUser, saved => {
-          req.flash('success', 'Welcome, ');
+    // creates user with passed in form info
+    User.create({ username: req.body.username, password: req.body.password })
+      // hashes the users password
+      .then(result => {
+        result.hashPassword(result, () => {
+          // if the hash was successful, then re-directs to /
           passport.authenticate('local', {
             successRedirect: '/',
             failureRedirect: '/signup',
             successFlash: 'Welcome, '
           })(req, res);
         });
-      } else {
+      })
+      // runs if a user could not be created
+      .catch(() => {
         req.flash('failure', 'Username already exists');
         res.redirect('/signup');
-      }
-    });
+      });
   }
 });
 
@@ -204,13 +203,13 @@ router.post(
 );
 
 // saves the users session in a cookie based on the userID
-passport.serializeUser(function(user, done) {
+passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 
 // checks the cookie
-passport.deserializeUser(function(id, done) {
-  User.getUserById(id, function(err, user) {
+passport.deserializeUser((id, done) => {
+  User.getUserById(id, (err, user) => {
     done(err, user);
   });
 });
@@ -218,27 +217,26 @@ passport.deserializeUser(function(id, done) {
 // functions to handle authentication.
 passport.use(
   new LocalStrategy((username, password, done) => {
-    const checkUser = new User({ username, password });
     // checks for existing user
-    checkUser.findByUserName(username, (err, user) => {
-      if (err) throw err;
-      // returns message if no username found
-      if (!user) {
-        return done(null, false, { message: 'Incorrect Username' });
-      }
-
-      // checks if passwords match
-      checkUser.checkPassword(password, user.password, (err, isMatch) => {
-        if (err) return done(err);
-        // authenticates user if there is a matching password for the user
-        if (isMatch) {
-          return done(null, user);
-          // returns message if failed password did not match
-        } else {
-          return done(null, false, { message: 'Invalid Password' });
+    User.findOne({ username })
+      .then(user => {
+        // message to display if no user is found
+        if (!user) {
+          return done(null, false);
         }
-      });
-    });
+        // if a user is found, checks the requesting users password with the hashed password
+        user.checkPassword(password, user.password, (err, isMatch) => {
+          if (err) return done(err);
+          // authenticates user if there is a matching password for the user
+          if (isMatch) {
+            return done(null, user);
+            // returns message if failed password did not match
+          } else {
+            return done(null, false);
+          }
+        });
+      })
+      .catch(err => console.log(err));
   })
 );
 

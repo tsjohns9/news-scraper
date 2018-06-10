@@ -29,7 +29,7 @@ $(document).ready(function() {
   });
 
   // saves an article to the user
-  $('.save-article').on('click', function() {
+  $(document).on('click', '.save-article', function() {
     var self = $(this);
     // sends article id to the server to save article to the user
     $.post('/saveArticle', { id: $(this).attr('data-id') }, function(data) {
@@ -189,7 +189,9 @@ $(document).ready(function() {
               <a href="${article.link}" target="_blank">${article.title}</a> 
             </h3>
             <p class="mb-2">${article.excerpt}</p>
-            <button type="button" class="btn" data-id="${article._id}">Save Article</button>
+            <button type="button" class="btn save-article" data-id="${
+              article._id
+            }">Save Article</button>
           </div>
         </div>
       `);
