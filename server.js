@@ -54,8 +54,13 @@ app.engine(
 );
 app.set('view engine', '.hbs');
 
-// Connect to mongodb
-mongoose.connect('mongodb://localhost/news-scrapper');
+// If deployed, use the deployed database. Otherwise use the local mongoHeadlines database
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost/news-scrapper';
+
+// Set mongoose to leverage built in JavaScript ES6 Promises
+// Connect to the Mongo DB
+mongoose.Promise = Promise;
+mongoose.connect(MONGODB_URI);
 
 app.use(require('./routes/html-routes'));
 app.use(require('./routes/api-routes'));
