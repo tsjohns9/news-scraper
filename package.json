@@ -1,43 +1,44 @@
 {
-  "name": "news-scrapper",
-  "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "axios": "^0.18.0",
-    "bcryptjs": "^2.4.3",
-    "body-parser": "^1.18.2",
-    "bootstrap": "^4.1.1",
-    "cheerio": "^1.0.0-rc.2",
-    "connect-flash": "^0.1.1",
-    "cookie-parser": "^1.4.3",
-    "express": "^4.16.3",
-    "express-handlebars": "^3.0.0",
-    "express-session": "^1.15.6",
-    "express-validator": "^5.2.0",
-    "jquery": "^3.3.1",
-    "mongoose": "^5.0.16",
-    "morgan": "^1.9.0",
-    "passport": "^0.4.0",
-    "passport-http": "^0.3.0",
-    "passport-local": "^1.0.0",
-    "request": "^2.85.0"
-  },
-  "devDependencies": {
-    "browser-sync": "2.24.3",
-    "gulp": "^3.9.1",
-    "gulp-babel": "^7.0.1",
-    "gulp-clean-css": "3.9.4",
-    "gulp-rename": "^1.2.2",
-    "gulp-nodemon": "^2.2.1",
-    "gulp-sass": "4.0.1",
-    "gulp-uglify": "3.0.0",
-    "pump": "^3.0.0"
-  }
+	"name": "news-scrapper",
+	"version": "1.0.0",
+	"description": "",
+	"main": "server.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "node server.js"
+	},
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"axios": "^0.18.0",
+		"bcryptjs": "^2.4.3",
+		"body-parser": "^1.18.2",
+		"bootstrap": "^4.1.1",
+		"cheerio": "^1.0.0-rc.2",
+		"connect-flash": "^0.1.1",
+		"cookie-parser": "^1.4.3",
+		"express": "^4.16.3",
+		"express-handlebars": "^3.0.0",
+		"express-session": "^1.15.6",
+		"express-validator": "^5.2.0",
+		"jquery": "^3.3.1",
+		"mongoose": "^5.0.16",
+		"morgan": "^1.9.0",
+		"passport": "^0.4.0",
+		"passport-http": "^0.3.0",
+		"passport-local": "^1.0.0",
+		"request": "^2.85.0",
+		"sass": "^1.77.1"
+	},
+	"devDependencies": {
+		"browser-sync": "2.24.3",
+		"gulp": "^5.0.0",
+		"gulp-babel": "^8.0.0",
+		"gulp-clean-css": "4.3.0",
+		"gulp-nodemon": "^2.5.0",
+		"gulp-rename": "^2.0.0",
+		"gulp-sass": "5.1.0",
+		"gulp-uglify": "3.0.2",
+		"pump": "^3.0.0"
+	}
 }

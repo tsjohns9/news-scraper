@@ -1,0 +1,25 @@
+.img-fluid {
+  width: 100% !important;
+  max-width: 300px !important;
+}
+
+.view-note, .create-note,
+.remove-article {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+@media (min-width: 768px) {
+  h3 {
+    font-size: 1.75rem;
+  }
+}
+@media (min-width: 992px) {
+  .view-note,
+  .create-note,
+  .remove-article {
+    width: auto;
+  }
+}
+
+/*# sourceMappingURL=_article.css.map */
